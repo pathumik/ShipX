@@ -105,7 +105,7 @@ export default function MapPage() {
     router.push("/mission");
   };
 
-  // Processing state - Explorer Map themed loading
+  // Processing state - Blackboard themed loading
   if (isProcessing || !state.map) {
     return (
       <div className="explorer-map-container flex flex-col items-center justify-center p-6">
@@ -114,7 +114,7 @@ export default function MapPage() {
         
         <div className="relative z-10 text-center max-w-md">
           <div className="mb-8">
-            {/* Compass animation */}
+            {/* Loading animation */}
             <div className="w-20 h-20 mx-auto mb-6 relative">
               <svg viewBox="0 0 80 80" className="w-full h-full">
                 <circle 
@@ -122,61 +122,59 @@ export default function MapPage() {
                   cy="40" 
                   r="35" 
                   fill="none" 
-                  stroke="#8b7355" 
+                  stroke="#2a2a32" 
                   strokeWidth="2" 
-                  strokeDasharray="8 4"
                 />
                 <circle 
                   cx="40" 
                   cy="40" 
-                  r="28" 
+                  r="35" 
                   fill="none" 
-                  stroke="#8b7355" 
-                  strokeWidth="1" 
-                  opacity="0.5"
+                  stroke="#f5c842" 
+                  strokeWidth="2" 
+                  strokeDasharray="60 160"
+                  className="animate-spin"
+                  style={{ transformOrigin: '40px 40px', animationDuration: '1.5s' }}
                 />
-                <g className="animate-spin" style={{ transformOrigin: '40px 40px', animationDuration: '3s' }}>
-                  <polygon points="40,15 43,35 40,40 37,35" fill="#8b3a3a" />
-                  <polygon points="40,65 43,45 40,40 37,45" fill="#2c2416" />
-                </g>
-                <circle cx="40" cy="40" r="4" fill="#2c2416" />
+                <circle 
+                  cx="40" 
+                  cy="40" 
+                  r="4" 
+                  fill="#f5c842"
+                />
               </svg>
             </div>
             
-            <h2 
-              className="text-2xl font-semibold mb-2"
-              style={{ color: '#2c2416', fontFamily: 'var(--font-header)' }}
-            >
-              Charting Your Territory...
+            <h2 className="text-xl font-semibold mb-2" style={{ color: '#f0f0f0' }}>
+              Mapping Your Journey...
             </h2>
-            <p style={{ color: '#8b7355', fontFamily: 'var(--font-body)' }}>
-              {processingStep === 1 && "Deciphering your expedition notes..."}
-              {processingStep === 2 && "Mapping the unknown territories..."}
-              {processingStep === 3 && "Planning your first expedition..."}
-              {processingStep === 4 && "Unfurling your map..."}
+            <p className="text-sm" style={{ color: '#6a6a78' }}>
+              {processingStep === 1 && "Analyzing your idea..."}
+              {processingStep === 2 && "Identifying uncertainties..."}
+              {processingStep === 3 && "Planning first mission..."}
+              {processingStep === 4 && "Rendering your map..."}
             </p>
           </div>
 
           {/* Progress steps */}
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-3">
             {[1, 2, 3, 4].map((step) => (
               <div
                 key={step}
                 className="flex flex-col items-center"
               >
                 <div
-                  className={`w-4 h-4 rounded-full transition-all ${
+                  className={`w-3 h-3 rounded-full transition-all ${
                     step < processingStep
-                      ? "bg-[#3a6b3a]"
+                      ? "bg-[#4ade80]"
                       : step === processingStep
-                      ? "bg-[#3a5a8b] animate-pulse"
-                      : "bg-[#d4c49a]"
+                      ? "bg-[#f5c842] animate-pulse"
+                      : "bg-[#2a2a32]"
                   }`}
-                  style={{ border: '2px solid #8b7355' }}
                 />
                 <span 
-                  className="text-xs mt-1 hidden sm:block"
-                  style={{ color: '#8b7355', fontFamily: 'var(--font-body)' }}
+                  className="text-xs mt-2 hidden sm:block"
+                  style={{ color: step <= processingStep ? '#9a9aa8' : '#4a4a54' }}
                 >
                   {step === 1 && "Extract"}
                   {step === 2 && "Classify"}
@@ -189,13 +187,13 @@ export default function MapPage() {
 
           {error && (
             <div 
-              className="mt-8 p-4 rounded border-2"
+              className="mt-8 p-4 rounded-lg"
               style={{ 
-                backgroundColor: 'rgba(139, 58, 58, 0.1)', 
-                borderColor: '#8b3a3a' 
+                backgroundColor: 'rgba(229, 69, 69, 0.1)', 
+                border: '1px solid rgba(229, 69, 69, 0.3)' 
               }}
             >
-              <p className="text-sm mb-3" style={{ color: '#8b3a3a', fontFamily: 'var(--font-body)' }}>
+              <p className="text-sm mb-3" style={{ color: '#e54545' }}>
                 {error}
               </p>
               <button
@@ -203,13 +201,7 @@ export default function MapPage() {
                   setError(null);
                   processIdea();
                 }}
-                className="px-4 py-2 rounded text-sm font-medium transition-colors"
-                style={{ 
-                  backgroundColor: '#8b3a3a', 
-                  color: '#f4e4c1',
-                  fontFamily: 'var(--font-header)',
-                  letterSpacing: '1px'
-                }}
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-colors btn-danger"
               >
                 TRY AGAIN
               </button>
@@ -231,33 +223,21 @@ export default function MapPage() {
         <header 
           className="relative z-10 p-4 flex items-center justify-between"
           style={{ 
-            borderBottom: '2px solid #8b7355',
-            backgroundColor: '#e8d4a8'
+            borderBottom: '1px solid #2a2a32',
+            backgroundColor: '#141418'
           }}
         >
           <div>
-            <h1 
-              className="text-lg font-semibold"
-              style={{ color: '#2c2416', fontFamily: 'var(--font-header)' }}
-            >
-              Expedition Log
+            <h1 className="text-lg font-semibold" style={{ color: '#f0f0f0' }}>
+              Journey Log
             </h1>
-            <p 
-              className="text-xs"
-              style={{ color: '#8b7355', fontFamily: 'var(--font-body)' }}
-            >
+            <p className="text-xs" style={{ color: '#6a6a78' }}>
               {state.timeline.length} entries recorded
             </p>
           </div>
           <button
             onClick={() => setShowTimeline(false)}
-            className="px-4 py-2 rounded transition-colors"
-            style={{ 
-              backgroundColor: '#8b7355', 
-              color: '#f4e4c1',
-              fontFamily: 'var(--font-header)',
-              letterSpacing: '1px'
-            }}
+            className="px-4 py-2 rounded-lg transition-colors btn-blackboard"
           >
             BACK TO MAP
           </button>
@@ -274,19 +254,11 @@ export default function MapPage() {
   return (
     <div className="explorer-map-container">
       {/* Control buttons overlay */}
-      <div 
-        className="absolute top-4 right-4 z-50 flex gap-2"
-        style={{ right: 'calc(var(--panel-width, 380px) + 20px)' }}
-      >
+      <div className="absolute top-20 left-5 z-50 flex flex-col gap-2">
         <button
           onClick={() => setShowTimeline(true)}
-          className="p-3 rounded-full transition-colors"
-          style={{ 
-            backgroundColor: '#e8d4a8', 
-            border: '2px solid #8b7355',
-            color: '#2c2416'
-          }}
-          title="Expedition Log"
+          className="map-control-btn"
+          title="Journey Log"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -295,12 +267,7 @@ export default function MapPage() {
         {!state.isWaitlistSaved && (
           <button
             onClick={() => setShowSaveModal(true)}
-            className="p-3 rounded-full transition-colors"
-            style={{ 
-              backgroundColor: '#e8d4a8', 
-              border: '2px solid #8b7355',
-              color: '#2c2416'
-            }}
+            className="map-control-btn"
             title="Save Journey"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,6 +282,7 @@ export default function MapPage() {
         map={state.map}
         mission={state.mission}
         nickname={state.nickname}
+        goal={state.structure?.idea_statement}
         onMissionClick={handleViewMission}
         onAddNode={addNode}
         onDeleteNode={deleteNode}
@@ -325,34 +293,23 @@ export default function MapPage() {
         <div 
           className="absolute bottom-0 left-0 right-0 z-40 p-4"
           style={{ 
-            backgroundColor: 'rgba(232, 212, 168, 0.95)',
-            borderTop: '2px solid #8b7355'
+            backgroundColor: 'rgba(20, 20, 24, 0.95)',
+            borderTop: '1px solid #2a2a32',
+            backdropFilter: 'blur(8px)'
           }}
         >
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <p 
-                className="text-xs mb-1"
-                style={{ color: '#8b7355', fontFamily: 'var(--font-body)' }}
-              >
-                Your risky assumption:
+              <p className="text-xs mb-1 uppercase tracking-wider" style={{ color: '#f5c842' }}>
+                Key Assumption to Test
               </p>
-              <p 
-                className="text-sm truncate"
-                style={{ color: '#2c2416', fontFamily: 'var(--font-body)' }}
-              >
+              <p className="text-sm truncate" style={{ color: '#f0f0f0' }}>
                 {state.structure.risky_assumption}
               </p>
             </div>
             <button
               onClick={handleViewMission}
-              className="flex-shrink-0 px-6 py-3 rounded font-medium transition-colors"
-              style={{ 
-                backgroundColor: '#3a6b3a', 
-                color: '#f4e4c1',
-                fontFamily: 'var(--font-header)',
-                letterSpacing: '1px'
-              }}
+              className="flex-shrink-0 px-6 py-3 rounded-lg font-semibold transition-colors btn-primary"
             >
               START MISSION
             </button>

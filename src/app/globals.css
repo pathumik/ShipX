@@ -2,41 +2,29 @@
 @import "../styles/explorer-theme.css";
 
 :root {
-  /* Dark theme - cyberpunk/neon aesthetic */
-  --background: #0a0a0f;
-  --foreground: #e8e8ed;
+  /* Base blackboard theme */
+  --background: #0d0d0f;
+  --foreground: #f0f0f0;
   
-  /* Primary accent - electric cyan */
-  --primary: #00f5d4;
-  --primary-dim: #00c4a7;
-  --primary-glow: rgba(0, 245, 212, 0.3);
+  /* Semantic colors from theme */
+  --primary: #f5c842;      /* Focus/Yellow */
+  --primary-dim: #c9a235;
+  --primary-glow: rgba(245, 200, 66, 0.3);
   
-  /* Secondary accent - warm coral */
-  --secondary: #ff6b6b;
-  --secondary-dim: #cc5555;
+  --secondary: #e54545;    /* Risk/Red */
+  --secondary-dim: #b83838;
   
-  /* Tertiary - purple */
-  --tertiary: #9b5de5;
-  --tertiary-dim: #7a4ab8;
+  --tertiary: #60a5fa;     /* Evidence/Blue */
+  --tertiary-dim: #4a8ad6;
   
   /* Surface colors */
-  --surface: #12121a;
-  --surface-elevated: #1a1a25;
-  --surface-border: #2a2a3a;
-  
-  /* Fog states */
-  --fog-high: rgba(10, 10, 15, 0.85);
-  --fog-medium: rgba(10, 10, 15, 0.5);
-  --fog-low: rgba(10, 10, 15, 0.15);
-  
-  /* Region colors */
-  --demand-color: #00f5d4;
-  --feasibility-color: #9b5de5;
-  --timing-color: #f9c74f;
+  --surface: #141418;
+  --surface-elevated: #1a1a20;
+  --surface-border: #2a2a32;
   
   /* Text */
-  --text-muted: #6b6b7a;
-  --text-dim: #9999a8;
+  --text-muted: #6a6a78;
+  --text-dim: #9a9aa8;
 }
 
 @theme inline {
@@ -68,7 +56,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - dark theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -84,10 +72,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-dim);
+  background: var(--text-muted);
 }
 
-/* Focus styles */
+/* Focus styles - yellow for visibility */
 *:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
@@ -162,7 +150,7 @@ body {
 .delay-400 { animation-delay: 400ms; }
 .delay-500 { animation-delay: 500ms; }
 
-/* Gradient text */
+/* Gradient text - yellow to blue */
 .gradient-text {
   background: linear-gradient(135deg, var(--primary) 0%, var(--tertiary) 100%);
   -webkit-background-clip: text;
@@ -170,9 +158,9 @@ body {
   background-clip: text;
 }
 
-/* Glass effect */
+/* Glass effect - dark variant */
 .glass {
-  background: rgba(18, 18, 26, 0.8);
+  background: rgba(20, 20, 24, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid var(--surface-border);
 }
@@ -202,21 +190,8 @@ body {
 
 .card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   border-color: var(--primary);
-}
-
-/* Region-specific colors */
-.region-demand {
-  --region-color: var(--demand-color);
-}
-
-.region-feasibility {
-  --region-color: var(--feasibility-color);
-}
-
-.region-timing {
-  --region-color: var(--timing-color);
 }
 
 /* Loading shimmer */

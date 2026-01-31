@@ -12,6 +12,7 @@ interface ExplorerMapProps {
   map: UncertaintyMapUIModel;
   mission?: MissionProposal;
   nickname: string;
+  goal?: string;
   onNodeClick?: (node: MapNode) => void;
   onMissionClick?: () => void;
   onAddNode?: (regionId: "demand" | "feasibility" | "timing", node: { label: string; type: NodeType; x: number; y: number; description?: string }) => void;
@@ -26,27 +27,27 @@ const VIEW_HEIGHT = 700;
 const REGION_CONFIG = {
   demand: {
     x: 50,
-    y: 50,
+    y: 80,
     width: 280,
-    height: 600,
+    height: 560,
     labelX: 190,
-    labelY: 80,
+    labelY: 100,
   },
   feasibility: {
     x: 360,
-    y: 50,
+    y: 80,
     width: 280,
-    height: 600,
+    height: 560,
     labelX: 500,
-    labelY: 80,
+    labelY: 100,
   },
   timing: {
     x: 670,
-    y: 50,
+    y: 80,
     width: 280,
-    height: 600,
+    height: 560,
     labelX: 810,
-    labelY: 80,
+    labelY: 100,
   },
 };
 
@@ -54,6 +55,7 @@ export default function ExplorerMap({
   map,
   mission,
   nickname,
+  goal,
   onNodeClick,
   onMissionClick,
   onAddNode,
@@ -116,9 +118,29 @@ export default function ExplorerMap({
 
   return (
     <div className="explorer-map-container">
-      {/* Texture overlays */}
+      {/* Subtle texture overlay */}
       <div className="texture-overlay" />
       <div className="vignette-overlay" />
+
+      {/* Goal Anchor - Top right corner */}
+      {goal && (
+        <div className="goal-anchor">
+          <div className="goal-anchor-label">NORTH STAR</div>
+          <div className="goal-anchor-text">{goal}</div>
+        </div>
+      )}
+
+      {/* Overall Clarity - Top center */}
+      <div className="clarity-indicator">
+        <span className="clarity-label">Clarity</span>
+        <span className="clarity-value">{Math.round(map.overall_readiness)}%</span>
+        <div className="clarity-bar">
+          <div 
+            className="clarity-fill" 
+            style={{ width: `${map.overall_readiness}%` }}
+          />
+        </div>
+      </div>
 
       {/* Main SVG Map */}
       <svg
@@ -126,113 +148,80 @@ export default function ExplorerMap({
         viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
         preserveAspectRatio="xMidYMid meet"
       >
-        {/* Definitions for patterns and filters */}
+        {/* Definitions for filters */}
         <defs>
-          {/* Parchment pattern */}
-          <pattern
-            id="parchmentPattern"
-            patternUnits="userSpaceOnUse"
-            width="100"
-            height="100"
-          >
-            <rect width="100" height="100" fill="#f4e4c1" />
-            <circle cx="50" cy="50" r="40" fill="#e8d4a8" opacity="0.3" />
-          </pattern>
-
-          {/* Paper texture filter */}
-          <filter id="paperTexture" x="0%" y="0%" width="100%" height="100%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.04"
-              numOctaves="5"
-              result="noise"
-            />
-            <feDiffuseLighting
-              in="noise"
-              lightingColor="#f4e4c1"
-              surfaceScale="2"
-              result="light"
-            >
-              <feDistantLight azimuth="45" elevation="60" />
-            </feDiffuseLighting>
-            <feBlend in="SourceGraphic" in2="light" mode="multiply" />
+          {/* Subtle glow filter for primary region */}
+          <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
 
-          {/* Fog gradient for each region */}
-          <linearGradient id="fogGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#f4e4c1" stopOpacity="0.9" />
-            <stop offset="50%" stopColor="#e8d4a8" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#f4e4c1" stopOpacity="0.9" />
+          {/* Darkness gradient for unexplored areas */}
+          <linearGradient id="darknessGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0d0d0f" stopOpacity="0.9" />
+            <stop offset="50%" stopColor="#0d0d0f" stopOpacity="0.7" />
+            <stop offset="100%" stopColor="#0d0d0f" stopOpacity="0.9" />
           </linearGradient>
 
-          {/* Hand-drawn effect filter */}
-          <filter id="handDrawn" x="-5%" y="-5%" width="110%" height="110%">
-            <feTurbulence
-              type="turbulence"
-              baseFrequency="0.05"
-              numOctaves="2"
-              result="turbulence"
+          {/* Subtle grid pattern */}
+          <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path 
+              d="M 40 0 L 0 0 0 40" 
+              fill="none" 
+              stroke="#1a1a20" 
+              strokeWidth="0.5"
             />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="turbulence"
-              scale="2"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-          </filter>
-
-          {/* Drop shadow for nodes */}
-          <filter id="nodeShadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="1" dy="1" stdDeviation="1" floodColor="#8b7355" floodOpacity="0.3" />
-          </filter>
+          </pattern>
         </defs>
 
-        {/* Background */}
+        {/* Background - Matte black surface */}
         <rect
           x="0"
           y="0"
           width={VIEW_WIDTH}
           height={VIEW_HEIGHT}
-          fill="#f4e4c1"
-          className="parchment-bg"
+          fill="#0d0d0f"
+          className="blackboard-bg"
         />
 
-        {/* Decorative border */}
+        {/* Subtle grid overlay */}
         <rect
-          x="10"
-          y="10"
-          width={VIEW_WIDTH - 20}
-          height={VIEW_HEIGHT - 20}
-          fill="none"
-          stroke="#8b7355"
-          strokeWidth="3"
-          strokeDasharray="15 5 5 5"
-          rx="5"
+          x="0"
+          y="0"
+          width={VIEW_WIDTH}
+          height={VIEW_HEIGHT}
+          fill="url(#gridPattern)"
+          opacity="0.3"
         />
 
-        {/* Inner border */}
+        {/* Minimal border */}
         <rect
-          x="25"
-          y="25"
-          width={VIEW_WIDTH - 50}
-          height={VIEW_HEIGHT - 50}
+          x="20"
+          y="20"
+          width={VIEW_WIDTH - 40}
+          height={VIEW_HEIGHT - 40}
           fill="none"
-          stroke="#8b7355"
+          stroke="#2a2a32"
           strokeWidth="1"
+          rx="4"
           opacity="0.5"
-          rx="3"
         />
 
-        {/* Map Title */}
+        {/* Map Title - Minimal */}
         <text
           x={VIEW_WIDTH / 2}
-          y="35"
+          y="50"
           textAnchor="middle"
-          className="region-label"
-          style={{ fontSize: "14px", letterSpacing: "4px" }}
+          fill="#4a4a54"
+          fontSize="11"
+          fontWeight="500"
+          letterSpacing="3"
+          style={{ fontFamily: "var(--font-header)" }}
         >
-          {nickname.toUpperCase()}&apos;S UNCERTAINTY MAP
+          {nickname.toUpperCase()}&apos;S JOURNEY
         </text>
 
         {/* Calculate all node positions for connections */}
@@ -244,7 +233,7 @@ export default function ExplorerMap({
             (region.nodes || []).forEach((node, idx) => {
               nodePositions[node.id] = {
                 x: config.x + (node.x ?? 50) * (config.width / 100),
-                y: config.y + 120 + (node.y ?? idx * 80) * (config.height - 150) / 100,
+                y: config.y + 100 + (node.y ?? idx * 80) * (config.height - 130) / 100,
               };
             });
           });
@@ -280,7 +269,7 @@ export default function ExplorerMap({
               {(region.nodes || []).map((node, idx) => {
                 // Calculate node position within region
                 const nodeX = config.x + (node.x ?? 50) * (config.width / 100);
-                const nodeY = config.y + 120 + (node.y ?? idx * 80) * (config.height - 150) / 100;
+                const nodeY = config.y + 100 + (node.y ?? idx * 80) * (config.height - 130) / 100;
 
                 return (
                   <MapNodeComponent
@@ -297,80 +286,64 @@ export default function ExplorerMap({
           );
         })}
 
-        {/* Compass Rose (decorative) */}
-        <g transform="translate(920, 620)" opacity="0.6">
-          <circle cx="0" cy="0" r="25" fill="none" stroke="#8b7355" strokeWidth="1" />
-          <line x1="0" y1="-20" x2="0" y2="20" stroke="#8b7355" strokeWidth="1" />
-          <line x1="-20" y1="0" x2="20" y2="0" stroke="#8b7355" strokeWidth="1" />
-          <text x="0" y="-28" textAnchor="middle" fill="#8b7355" fontSize="10">N</text>
-          <polygon points="0,-15 -4,-5 4,-5" fill="#8b7355" />
-        </g>
-
-        {/* Overall Readiness indicator */}
-        <g transform={`translate(${VIEW_WIDTH / 2}, ${VIEW_HEIGHT - 30})`}>
-          <text
-            x="0"
-            y="0"
-            textAnchor="middle"
-            fill="#8b7355"
-            fontSize="11"
-            style={{ fontFamily: "var(--font-body)" }}
-          >
-            OVERALL CLARITY: {Math.round(map.overall_readiness)}%
-          </text>
+        {/* Overall progress indicator at bottom */}
+        <g transform={`translate(${VIEW_WIDTH / 2}, ${VIEW_HEIGHT - 35})`}>
           <rect
-            x="-60"
-            y="8"
-            width="120"
+            x="-150"
+            y="-3"
+            width="300"
             height="6"
-            fill="#d4c49a"
+            fill="#1a1a20"
             rx="3"
           />
           <rect
-            x="-60"
-            y="8"
-            width={120 * (map.overall_readiness / 100)}
+            x="-150"
+            y="-3"
+            width={300 * (map.overall_readiness / 100)}
             height="6"
-            fill="#3a6b3a"
+            fill={map.overall_readiness >= 70 ? "#4ade80" : map.overall_readiness >= 40 ? "#60a5fa" : "#f5c842"}
             rx="3"
+            style={{ transition: "width 0.6s ease-out" }}
           />
         </g>
       </svg>
 
-      {/* Map Legend */}
+      {/* Map Legend - Minimal */}
       <div className="map-legend">
-        <div className="legend-title">LEGEND</div>
+        <div className="legend-title">SYMBOLS</div>
         <div className="legend-item">
           <div className="legend-symbol">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <path d="M8 2 L10 6 L8 14 L6 6 Z" fill="none" stroke="#8b3a3a" strokeWidth="1.5" />
-            </svg>
-          </div>
-          <span>Assumption</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-symbol">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="5" fill="#3a5a8b" />
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <circle cx="7" cy="7" r="4" fill="#60a5fa" />
             </svg>
           </div>
           <span>Checkpoint</span>
         </div>
         <div className="legend-item">
           <div className="legend-symbol">
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <rect x="4" y="4" width="8" height="8" transform="rotate(45 8 8)" fill="#3a6b3a" />
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <line x1="2" y1="3" x2="2" y2="11" stroke="#e54545" strokeWidth="1.5" />
+              <path d="M2 3 L10 6 L2 9" fill="#e54545" />
+            </svg>
+          </div>
+          <span>Assumption</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-symbol">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <rect x="3" y="3" width="8" height="8" transform="rotate(45 7 7)" fill="#4ade80" />
             </svg>
           </div>
           <span>Completed</span>
         </div>
         <div className="legend-item">
-          <div className="legend-symbol" style={{ opacity: 0.5 }}>
-            <svg width="16" height="16" viewBox="0 0 16 16">
-              <circle cx="8" cy="8" r="5" fill="none" stroke="#8b7355" strokeWidth="1.5" strokeDasharray="2 2" />
+          <div className="legend-symbol">
+            <svg width="14" height="14" viewBox="0 0 14 14">
+              <line x1="3" y1="3" x2="11" y2="11" stroke="#e54545" strokeWidth="2" />
+              <line x1="11" y1="3" x2="3" y2="11" stroke="#e54545" strokeWidth="2" />
             </svg>
           </div>
-          <span>Locked</span>
+          <span>Blocked</span>
         </div>
       </div>
 

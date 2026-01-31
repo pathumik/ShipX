@@ -10,72 +10,70 @@ interface MapNodeProps {
   onClick: () => void;
 }
 
-// Node symbol SVG paths based on type
+// Minimal symbol definitions - placed on the map like marks
 const NodeSymbols = {
-  // Flag shape for assumptions
-  assumption: (
-    <path
-      d="M0 -12 L0 12 M0 -12 L12 -6 L0 0"
-      className="node-symbol"
-      fill="none"
-      strokeWidth="2"
-    />
-  ),
-  // Filled circle for checkpoints
+  // Simple filled dot for checkpoints
   checkpoint: (
     <circle
       cx="0"
       cy="0"
-      r="8"
+      r="6"
       className="node-symbol"
     />
   ),
-  // Diamond for completed
+  // Diamond for completed/validated
   completed: (
     <rect
-      x="-8"
-      y="-8"
-      width="16"
-      height="16"
+      x="-6"
+      y="-6"
+      width="12"
+      height="12"
       transform="rotate(45)"
       className="node-symbol"
     />
   ),
-  // X mark for blocked/invalidated
+  // X mark for blocked
   blocked: (
     <g className="node-symbol">
-      <line x1="-8" y1="-8" x2="8" y2="8" strokeWidth="3" />
-      <line x1="8" y1="-8" x2="-8" y2="8" strokeWidth="3" />
+      <line x1="-6" y1="-6" x2="6" y2="6" strokeWidth="2.5" />
+      <line x1="6" y1="-6" x2="-6" y2="6" strokeWidth="2.5" />
     </g>
   ),
-  // Star for validated
+  // Small flag for assumptions (critical questions)
+  assumption: (
+    <g className="node-symbol">
+      <line x1="0" y1="-8" x2="0" y2="8" strokeWidth="2" />
+      <path d="M0 -8 L10 -4 L0 0" fill="currentColor" strokeWidth="0" />
+    </g>
+  ),
+  // Star for validated assumptions
   validated: (
     <polygon
-      points="0,-10 3,-4 10,-4 5,1 7,8 0,4 -7,8 -5,1 -10,-4 -3,-4"
+      points="0,-8 2,-3 8,-3 4,1 6,7 0,4 -6,7 -4,1 -8,-3 -2,-3"
       className="node-symbol"
     />
   ),
-  // Dotted circle for locked
+  // Dotted circle for locked/unavailable
   locked: (
     <circle
       cx="0"
       cy="0"
-      r="8"
+      r="6"
       className="node-symbol"
       fill="none"
-      strokeDasharray="3 3"
+      strokeDasharray="2 2"
     />
   ),
-  // Question mark for unknown
+  // Circle with question mark for unknown
   unknown: (
     <g className="node-symbol">
-      <circle cx="0" cy="0" r="10" fill="none" strokeWidth="2" />
+      <circle cx="0" cy="0" r="8" fill="none" strokeWidth="1.5" />
       <text
         x="0"
-        y="5"
+        y="4"
         textAnchor="middle"
-        fontSize="14"
-        fontWeight="bold"
+        fontSize="12"
+        fontWeight="600"
         fill="currentColor"
       >
         ?
@@ -84,25 +82,25 @@ const NodeSymbols = {
   ),
 };
 
-// Get stroke color based on node type and status
+// Semantic color mapping based on node state
 function getNodeColor(node: MapNode): string {
-  if (node.status === "blocked") return "#8b3a3a"; // Red
-  if (node.status === "validated") return "#3a6b3a"; // Green
-  if (node.status === "completed") return "#3a6b3a"; // Green
-  if (node.locked) return "#8b7355"; // Aged brown
+  // Status-based colors first
+  if (node.status === "blocked") return "#e54545"; // Red - risk
+  if (node.status === "validated" || node.status === "completed") return "#4ade80"; // Green - progress
+  if (node.locked) return "#3a3a42"; // Muted
   
-  // Based on type
+  // Type-based colors
   switch (node.type) {
     case "assumption":
-      return "#8b3a3a"; // Red ink
+      return "#e54545"; // Red - assumptions are risks until validated
     case "checkpoint":
-      return "#3a5a8b"; // Blue ink
+      return "#60a5fa"; // Blue - evidence points
     default:
-      return "#2c2416"; // Black ink
+      return "#f0f0f0"; // White - structure
   }
 }
 
-// Get the appropriate symbol for the node
+// Get the appropriate symbol based on node state
 function getNodeSymbol(node: MapNode): keyof typeof NodeSymbols {
   if (node.status === "blocked") return "blocked";
   if (node.status === "validated") return "validated";
@@ -159,78 +157,88 @@ export default function MapNodeComponent({
         color,
         cursor: node.locked ? "not-allowed" : "pointer",
       }}
-      filter="url(#nodeShadow)"
     >
-      {/* Background glow for selected state */}
-      {isSelected && (
-        <circle
-          cx="0"
-          cy="0"
-          r="18"
-          fill={color}
-          opacity="0.2"
-        />
-      )}
-
-      {/* Main symbol */}
-      <g style={{ stroke: color, fill: symbolType === "assumption" || symbolType === "blocked" || symbolType === "locked" ? "none" : color }}>
-        {symbol}
-      </g>
-
-      {/* Selection ring */}
+      {/* Selection glow - yellow focus */}
       {isSelected && (
         <circle
           cx="0"
           cy="0"
           r="16"
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          strokeDasharray="4 2"
+          fill="rgba(245, 200, 66, 0.15)"
+          stroke="#f5c842"
+          strokeWidth="1"
           className="node-highlight"
         />
       )}
 
-      {/* Label */}
+      {/* Main symbol */}
+      <g 
+        style={{ 
+          stroke: color, 
+          fill: symbolType === "assumption" || symbolType === "blocked" || symbolType === "locked" || symbolType === "unknown" 
+            ? "none" 
+            : color 
+        }}
+      >
+        {symbol}
+      </g>
+
+      {/* Label - positioned below */}
       <text
         x="0"
-        y="24"
+        y="20"
         className="node-label"
-        style={{ fontFamily: "var(--font-annotation)" }}
+        fill="#9a9aa8"
+        fontSize="10"
+        fontWeight="500"
+        textAnchor="middle"
+        style={{ fontFamily: "var(--font-body)" }}
       >
-        {nodeLabel.length > 20 ? nodeLabel.slice(0, 18) + "..." : nodeLabel}
+        {nodeLabel.length > 18 ? nodeLabel.slice(0, 16) + "…" : nodeLabel}
       </text>
 
-      {/* Lock indicator */}
+      {/* Lock indicator - small icon */}
       {node.locked && (
-        <g transform="translate(12, -12)">
-          <rect x="-5" y="-5" width="10" height="10" fill="#f4e4c1" rx="2" />
+        <g transform="translate(10, -10)">
+          <circle cx="0" cy="0" r="6" fill="#141418" stroke="#3a3a42" strokeWidth="1" />
           <text
             x="0"
             y="3"
             textAnchor="middle"
-            fontSize="8"
-            fill="#8b7355"
+            fontSize="7"
+            fill="#6a6a78"
           >
             🔒
           </text>
         </g>
       )}
 
-      {/* Status indicator dot */}
-      {node.status && node.status !== "active" && (
+      {/* Status indicator dot - top right */}
+      {node.status && node.status !== "active" && !isSelected && (
         <circle
-          cx="10"
-          cy="-10"
-          r="4"
+          cx="8"
+          cy="-8"
+          r="3"
           fill={
             node.status === "validated" || node.status === "completed"
-              ? "#3a6b3a"
+              ? "#4ade80"
               : node.status === "blocked"
-              ? "#8b3a3a"
-              : "#3a5a8b"
+              ? "#e54545"
+              : "#60a5fa"
           }
         />
+      )}
+
+      {/* User-created indicator */}
+      {node.isUserCreated && (
+        <text
+          x="10"
+          y="8"
+          fontSize="8"
+          fill="#6a6a78"
+        >
+          ✎
+        </text>
       )}
     </g>
   );

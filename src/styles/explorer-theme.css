@@ -1,53 +1,53 @@
 /* ============================================
-   SHIPX EXPLORER MAP THEME
-   Cartographer / Old Map Visual System
+   SHIPX JOURNEY MAP THEME
+   Blackboard / Matte Surface Visual System
    ============================================ */
 
 /* ============================================
    CSS VARIABLES - SEMANTIC COLOR SYSTEM
+   Every color means something. No decoration.
    ============================================ */
 
 :root {
-  /* Base Parchment Colors */
-  --parchment-light: #f4e4c1;
-  --parchment-mid: #e8d4a8;
-  --parchment-dark: #d4c49a;
-  --parchment-shadow: #c4b088;
+  /* Base Surface - Deep Matte Black */
+  --surface-base: #0d0d0f;
+  --surface-elevated: #141418;
+  --surface-border: #2a2a32;
   
-  /* Aged Brown - Structure */
-  --aged-brown: #8b7355;
-  --aged-brown-light: #a08868;
-  --aged-brown-dark: #6b5a45;
+  /* White - Structure, Labels, Paths */
+  --color-structure: #f0f0f0;
+  --color-structure-dim: #9a9aa8;
+  --color-structure-muted: #6a6a78;
   
-  /* Black Ink - Confirmed/Known */
-  --ink-black: #2c2416;
-  --ink-black-faded: #4a3d2e;
+  /* Yellow - Focus, Current Step, Attention */
+  --color-focus: #f5c842;
+  --color-focus-dim: #c9a235;
+  --color-focus-glow: rgba(245, 200, 66, 0.3);
   
-  /* Red Ink - Risk/Danger */
-  --ink-red: #8b3a3a;
-  --ink-red-light: #a54a4a;
-  --ink-red-faded: #6b2a2a;
+  /* Red - Risk, Blockers, Critical */
+  --color-risk: #e54545;
+  --color-risk-dim: #b83838;
+  --color-risk-muted: rgba(229, 69, 69, 0.2);
   
-  /* Blue Ink - Evidence/Learning */
-  --ink-blue: #3a5a8b;
-  --ink-blue-light: #4a6a9b;
-  --ink-blue-faded: #2a4a7b;
+  /* Green - Progress, Validated, Confidence */
+  --color-progress: #4ade80;
+  --color-progress-dim: #3ab866;
+  --color-progress-muted: rgba(74, 222, 128, 0.2);
   
-  /* Green Ink - Progress/Clarity */
-  --ink-green: #3a6b3a;
-  --ink-green-light: #4a7b4a;
-  --ink-green-faded: #2a5b2a;
+  /* Blue - Evidence, Experiments, Observations */
+  --color-evidence: #60a5fa;
+  --color-evidence-dim: #4a8ad6;
+  --color-evidence-muted: rgba(96, 165, 250, 0.2);
   
-  /* Fog Colors */
-  --fog-color: rgba(244, 228, 193, 0.9);
-  --fog-heavy: 0.75;
-  --fog-medium: 0.45;
-  --fog-light: 0.15;
+  /* Muted - Inactive, Unexplored, Locked */
+  --color-muted: #3a3a42;
+  --color-muted-dim: #28282e;
+  --color-muted-light: #4a4a54;
   
-  /* Typography - using CSS variables from layout */
-  --font-header: var(--font-cinzel), 'Times New Roman', serif;
-  --font-body: var(--font-crimson), 'Georgia', serif;
-  --font-annotation: var(--font-caveat), cursive;
+  /* Typography */
+  --font-header: var(--font-geist-sans), system-ui, sans-serif;
+  --font-body: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
   
   /* Spacing */
   --map-padding: 24px;
@@ -55,9 +55,9 @@
   --panel-width: 380px;
   
   /* Transitions */
-  --transition-fog: 1.2s ease-out;
-  --transition-panel: 0.3s ease-out;
-  --transition-node: 0.2s ease-out;
+  --transition-fast: 0.15s ease-out;
+  --transition-normal: 0.3s ease-out;
+  --transition-slow: 0.6s ease-out;
 }
 
 /* ============================================
@@ -71,7 +71,7 @@
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  background: var(--parchment-light);
+  background: var(--surface-base);
 }
 
 .explorer-map-svg {
@@ -81,151 +81,165 @@
 }
 
 /* ============================================
-   PARCHMENT TEXTURE
+   BLACKBOARD SURFACE
    ============================================ */
 
-.parchment-bg {
-  fill: var(--parchment-light);
+.blackboard-bg {
+  fill: var(--surface-base);
 }
 
-/* SVG filter for paper texture */
-.paper-texture {
-  filter: url(#paperTexture);
-}
-
-/* Noise overlay for texture */
+/* Subtle noise texture - barely visible */
 .texture-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.08;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
-/* Vignette effect */
+/* Subtle vignette for depth */
 .vignette-overlay {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: radial-gradient(
     ellipse at center,
-    transparent 50%,
-    rgba(139, 115, 85, 0.15) 100%
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 100%
   );
 }
 
 /* ============================================
-   REGION TERRITORIES
+   REGION TERRITORIES - Implicit Boundaries
    ============================================ */
 
 .map-region {
   cursor: pointer;
-  transition: filter var(--transition-node);
+  transition: filter var(--transition-fast);
 }
 
 .map-region:hover {
-  filter: brightness(1.02);
+  filter: brightness(1.1);
 }
 
 .region-territory {
-  fill: var(--parchment-mid);
-  stroke: var(--aged-brown);
-  stroke-width: 2;
-  stroke-dasharray: 8 4;
+  fill: transparent;
+  stroke: var(--color-structure-muted);
+  stroke-width: 1;
+  stroke-dasharray: 4 8;
+  opacity: 0.3;
 }
 
+/* Region colors - subtle zone differentiation */
 .region-territory-demand {
-  fill: rgba(58, 107, 58, 0.05);
+  fill: rgba(74, 222, 128, 0.03);
 }
 
 .region-territory-feasibility {
-  fill: rgba(58, 90, 139, 0.05);
+  fill: rgba(96, 165, 250, 0.03);
 }
 
 .region-territory-timing {
-  fill: rgba(139, 58, 58, 0.05);
+  fill: rgba(245, 200, 66, 0.03);
 }
 
-/* Region Labels */
+/* Region Labels - Hidden by default, shown on hover */
 .region-label {
   font-family: var(--font-header);
-  font-size: 18px;
-  font-weight: 600;
-  fill: var(--aged-brown);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--color-structure-muted);
   text-anchor: middle;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
   text-transform: uppercase;
+  opacity: 0.4;
+  transition: opacity var(--transition-fast);
+}
+
+.map-region:hover .region-label {
+  opacity: 0.8;
 }
 
 .region-sublabel {
   font-family: var(--font-body);
-  font-size: 12px;
-  fill: var(--aged-brown-light);
+  font-size: 10px;
+  fill: var(--color-structure-muted);
   text-anchor: middle;
   font-style: italic;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
 }
 
-/* Primary region highlight */
+.map-region:hover .region-sublabel {
+  opacity: 0.5;
+}
+
+/* Primary region - subtle highlight */
 .region-primary .region-territory {
-  stroke: var(--ink-black);
-  stroke-width: 3;
+  stroke: var(--color-focus);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  opacity: 0.5;
 }
 
 .region-primary .region-label {
-  fill: var(--ink-black);
+  fill: var(--color-focus);
+  opacity: 0.7;
 }
 
 /* ============================================
-   FOG OF UNCERTAINTY
+   DARKNESS LAYER (replaces fog)
    ============================================ */
 
 .fog-layer {
-  fill: var(--parchment-light);
-  transition: opacity var(--transition-fog);
+  fill: var(--surface-base);
+  transition: opacity var(--transition-slow);
   pointer-events: none;
 }
 
 .fog-high {
-  opacity: var(--fog-heavy);
+  opacity: 0.85;
 }
 
 .fog-medium {
-  opacity: var(--fog-medium);
+  opacity: 0.5;
 }
 
 .fog-low {
-  opacity: var(--fog-light);
+  opacity: 0.15;
 }
 
-/* Fog clearing animation */
-@keyframes fogClear {
+/* Darkness clearing animation */
+@keyframes darknessLift {
   from {
-    opacity: var(--fog-heavy);
+    opacity: 0.85;
   }
   to {
-    opacity: var(--fog-light);
+    opacity: 0.15;
   }
 }
 
 .fog-clearing {
-  animation: fogClear var(--transition-fog) ease-out forwards;
+  animation: darknessLift var(--transition-slow) ease-out forwards;
 }
 
 /* ============================================
    MAP NODES (SYMBOLS)
+   Minimal, meaningful marks on the surface
    ============================================ */
 
 .map-node {
   cursor: pointer;
-  transition: transform var(--transition-node), opacity var(--transition-node);
+  transition: transform var(--transition-fast), filter var(--transition-fast);
 }
 
 .map-node:hover {
-  transform: scale(1.15);
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 8px var(--color-focus-glow));
 }
 
 .map-node.selected {
-  transform: scale(1.2);
+  transform: scale(1.25);
 }
 
 /* Node symbol base */
@@ -235,43 +249,51 @@
   stroke-linejoin: round;
 }
 
-/* Assumption node (flag) */
+/* Assumption node (flag) - Red for risk */
 .node-assumption .node-symbol {
   fill: none;
-  stroke: var(--ink-red);
+  stroke: var(--color-risk);
 }
 
 .node-assumption.validated .node-symbol {
-  stroke: var(--ink-green);
+  stroke: var(--color-progress);
 }
 
-/* Checkpoint node (dot) */
+/* Checkpoint node (filled dot) - Blue for evidence */
 .node-checkpoint .node-symbol {
-  fill: var(--ink-blue);
-  stroke: var(--ink-blue);
+  fill: var(--color-evidence);
+  stroke: var(--color-evidence);
 }
 
-/* Completed node (diamond) */
+/* Completed node (diamond) - Green for progress */
 .node-completed .node-symbol {
-  fill: var(--ink-green);
-  stroke: var(--ink-green-faded);
+  fill: var(--color-progress);
+  stroke: var(--color-progress-dim);
 }
 
-/* Blocked node (cross) */
+/* Blocked node (cross) - Red for risk */
 .node-blocked .node-symbol {
   fill: none;
-  stroke: var(--ink-red);
-  stroke-width: 3;
+  stroke: var(--color-risk);
+  stroke-width: 2.5;
 }
 
-/* Locked node */
+/* Locked node - Muted */
 .node-locked {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .node-locked:hover {
   transform: none;
+  filter: none;
+}
+
+/* Active/Current node - Yellow focus */
+.node-active .node-symbol,
+.node-current .node-symbol {
+  stroke: var(--color-focus);
+  filter: drop-shadow(0 0 6px var(--color-focus-glow));
 }
 
 /* User-created node indicator */
@@ -281,9 +303,10 @@
 
 /* Node labels */
 .node-label {
-  font-family: var(--font-annotation);
-  font-size: 14px;
-  fill: var(--ink-black-faded);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  fill: var(--color-structure-dim);
   text-anchor: middle;
   pointer-events: none;
 }
@@ -291,13 +314,10 @@
 /* Node tooltip */
 .node-tooltip {
   font-family: var(--font-body);
-  font-size: 12px;
-  fill: var(--ink-black);
-  background: var(--parchment-light);
-  padding: 4px 8px;
-  border-radius: 4px;
+  font-size: 11px;
+  fill: var(--color-structure);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--transition-fast);
   pointer-events: none;
 }
 
@@ -315,29 +335,29 @@
 }
 
 .path-active {
-  stroke: var(--ink-black);
-  stroke-width: 2;
-  stroke-dasharray: 8 4;
+  stroke: var(--color-structure-dim);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
 }
 
 .path-validated {
-  stroke: var(--ink-green);
+  stroke: var(--color-progress);
   stroke-width: 2;
   stroke-dasharray: none;
 }
 
 .path-abandoned {
-  stroke: var(--ink-red-faded);
-  stroke-width: 1.5;
-  stroke-dasharray: 4 8;
-  opacity: 0.5;
+  stroke: var(--color-risk-dim);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.4;
 }
 
 .path-potential {
-  stroke: var(--aged-brown-light);
+  stroke: var(--color-muted);
   stroke-width: 1;
-  stroke-dasharray: 2 6;
-  opacity: 0.3;
+  stroke-dasharray: 2 4;
+  opacity: 0.25;
 }
 
 /* Animated path drawing */
@@ -348,9 +368,9 @@
 }
 
 .path-drawing {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: drawPath 2s ease-out forwards;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: drawPath 1.5s ease-out forwards;
 }
 
 /* ============================================
@@ -364,11 +384,11 @@
   width: var(--panel-width);
   max-width: 90vw;
   height: 100%;
-  background: var(--parchment-light);
-  border-left: 3px solid var(--aged-brown);
-  box-shadow: -8px 0 24px rgba(44, 36, 22, 0.15);
+  background: var(--surface-elevated);
+  border-left: 1px solid var(--surface-border);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5);
   transform: translateX(100%);
-  transition: transform var(--transition-panel);
+  transition: transform var(--transition-normal);
   z-index: 100;
   overflow-y: auto;
   overflow-x: hidden;
@@ -382,8 +402,8 @@
   position: sticky;
   top: 0;
   padding: 20px;
-  background: var(--parchment-mid);
-  border-bottom: 2px solid var(--aged-brown);
+  background: var(--surface-base);
+  border-bottom: 1px solid var(--surface-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -391,9 +411,11 @@
 
 .side-panel-title {
   font-family: var(--font-header);
-  font-size: 18px;
-  color: var(--ink-black);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-structure);
   margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .side-panel-close {
@@ -403,16 +425,16 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 2px solid var(--aged-brown);
-  border-radius: 50%;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
   cursor: pointer;
-  color: var(--aged-brown);
-  transition: all 0.2s;
+  color: var(--color-structure-dim);
+  transition: all var(--transition-fast);
 }
 
 .side-panel-close:hover {
-  background: var(--aged-brown);
-  color: var(--parchment-light);
+  background: var(--surface-border);
+  color: var(--color-structure);
 }
 
 .side-panel-content {
@@ -423,10 +445,10 @@
 .panel-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(44, 36, 22, 0.3);
+  background: rgba(0, 0, 0, 0.6);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
+  transition: opacity var(--transition-normal), visibility var(--transition-normal);
   z-index: 99;
 }
 
@@ -444,28 +466,34 @@
   bottom: 20px;
   left: 20px;
   padding: 16px;
-  background: var(--parchment-mid);
-  border: 2px solid var(--aged-brown);
-  border-radius: 4px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 11px;
   z-index: 50;
 }
 
 .legend-title {
   font-family: var(--font-header);
-  font-size: 14px;
-  color: var(--ink-black);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-structure-dim);
   margin-bottom: 12px;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  color: var(--ink-black-faded);
+  gap: 10px;
+  margin-bottom: 10px;
+  color: var(--color-structure-dim);
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
 }
 
 .legend-symbol {
@@ -477,53 +505,66 @@
 }
 
 /* ============================================
-   CLARITY INDICATOR
+   PROGRESS INDICATORS (Edge Bars)
    ============================================ */
 
-.clarity-indicator {
+.progress-edge-bar {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  padding: 12px 16px;
-  background: var(--parchment-mid);
-  border: 2px solid var(--aged-brown);
-  border-radius: 4px;
-  font-family: var(--font-body);
-  z-index: 50;
-}
-
-.clarity-label {
-  font-size: 11px;
-  color: var(--aged-brown);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-
-.clarity-value {
-  font-family: var(--font-header);
-  font-size: 24px;
-  color: var(--ink-black);
-}
-
-.clarity-bar {
-  width: 120px;
-  height: 6px;
-  background: var(--parchment-dark);
-  border-radius: 3px;
-  margin-top: 8px;
+  background: var(--color-muted-dim);
+  border-radius: 2px;
   overflow: hidden;
 }
 
-.clarity-fill {
+.progress-edge-bar-fill {
   height: 100%;
-  background: var(--ink-green);
-  border-radius: 3px;
-  transition: width 0.5s ease-out;
+  background: var(--color-progress);
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+.progress-edge-bar.vertical {
+  width: 4px;
+  height: 100%;
+}
+
+.progress-edge-bar.vertical .progress-edge-bar-fill {
+  width: 100%;
 }
 
 /* ============================================
-   USER CONTROLS
+   GOAL ANCHOR
+   ============================================ */
+
+.goal-anchor {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--color-focus);
+  border-radius: 8px;
+  z-index: 50;
+}
+
+.goal-anchor-label {
+  font-family: var(--font-header);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--color-focus);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.goal-anchor-text {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-structure);
+  font-weight: 500;
+}
+
+/* ============================================
+   MAP CONTROLS
    ============================================ */
 
 .map-controls {
@@ -542,57 +583,277 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--parchment-mid);
-  border: 2px solid var(--aged-brown);
-  border-radius: 50%;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
   cursor: pointer;
-  color: var(--ink-black);
-  transition: all 0.2s;
+  color: var(--color-structure-dim);
+  transition: all var(--transition-fast);
 }
 
 .map-control-btn:hover {
-  background: var(--aged-brown);
-  color: var(--parchment-light);
+  background: var(--surface-border);
+  color: var(--color-structure);
+  border-color: var(--color-structure-muted);
 }
 
 .map-control-btn.active {
-  background: var(--ink-blue);
-  border-color: var(--ink-blue);
-  color: var(--parchment-light);
+  background: var(--color-focus);
+  border-color: var(--color-focus);
+  color: var(--surface-base);
 }
 
 /* ============================================
-   ANNOTATIONS
+   OVERALL READINESS
    ============================================ */
 
-.map-annotation {
-  font-family: var(--font-annotation);
-  font-size: 16px;
-  fill: var(--ink-blue-faded);
-  cursor: pointer;
-  transition: fill 0.2s;
-}
-
-.map-annotation:hover {
-  fill: var(--ink-blue);
-}
-
-.map-annotation.user-note {
-  fill: var(--ink-black-faded);
-}
-
-/* ============================================
-   COMPASS ROSE
-   ============================================ */
-
-.compass-rose {
+.clarity-indicator {
   position: absolute;
   top: 20px;
-  left: 20px;
-  width: 60px;
-  height: 60px;
-  opacity: 0.6;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  font-family: var(--font-body);
   z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.clarity-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-structure-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.clarity-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-structure);
+}
+
+.clarity-bar {
+  width: 80px;
+  height: 4px;
+  background: var(--color-muted-dim);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.clarity-fill {
+  height: 100%;
+  background: var(--color-progress);
+  border-radius: 2px;
+  transition: width var(--transition-slow);
+}
+
+/* ============================================
+   TIMELINE / LOG STYLES
+   ============================================ */
+
+.expedition-log-entry {
+  position: relative;
+  padding: 16px;
+  padding-left: 24px;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.expedition-log-entry::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 20px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-structure-muted);
+  border-radius: 50%;
+}
+
+.expedition-log-entry:last-child {
+  border-bottom: none;
+}
+
+.expedition-log-date {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-structure-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.expedition-log-content {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-structure-dim);
+  line-height: 1.5;
+}
+
+/* Entry types */
+.expedition-log-entry.type-progress::before {
+  background: var(--color-progress);
+}
+
+.expedition-log-entry.type-evidence::before {
+  background: var(--color-evidence);
+}
+
+.expedition-log-entry.type-risk::before {
+  background: var(--color-risk);
+}
+
+.expedition-log-entry.type-focus::before {
+  background: var(--color-focus);
+}
+
+/* ============================================
+   BUTTON VARIANTS
+   ============================================ */
+
+.btn-blackboard {
+  background: var(--surface-elevated);
+  border: 1px solid var(--surface-border);
+  color: var(--color-structure);
+  font-family: var(--font-header);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-blackboard:hover {
+  background: var(--surface-border);
+  border-color: var(--color-structure-muted);
+}
+
+.btn-blackboard:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--color-focus);
+  border: none;
+  color: var(--surface-base);
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background: var(--color-focus-dim);
+  box-shadow: 0 4px 20px var(--color-focus-glow);
+}
+
+.btn-success {
+  background: var(--color-progress);
+  border: none;
+  color: var(--surface-base);
+  font-family: var(--font-header);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-success:hover {
+  background: var(--color-progress-dim);
+  box-shadow: 0 4px 20px var(--color-progress-muted);
+}
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--color-risk);
+  color: var(--color-risk);
+  font-family: var(--font-header);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger:hover {
+  background: var(--color-risk);
+  color: var(--color-structure);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.node-appear {
+  animation: nodeAppear 0.4s ease-out forwards;
+}
+
+@keyframes pulseFocus {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px var(--color-focus-glow));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px var(--color-focus-glow));
+  }
+}
+
+.node-highlight {
+  animation: pulseFocus 2s ease-in-out infinite;
+}
+
+/* Map reveal animation */
+@keyframes mapReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.map-reveal {
+  animation: mapReveal 0.8s ease-out forwards;
+}
+
+/* Cleared area glow */
+@keyframes clearedGlow {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.cleared-area {
+  animation: clearedGlow 3s ease-in-out infinite;
 }
 
 /* ============================================
@@ -607,444 +868,75 @@
   
   .map-legend {
     bottom: auto;
-    top: 80px;
+    top: 70px;
     left: 10px;
     padding: 12px;
   }
   
-  .clarity-indicator {
+  .goal-anchor {
     top: 10px;
     right: 10px;
     padding: 8px 12px;
+    max-width: 50vw;
+  }
+  
+  .goal-anchor-text {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .clarity-indicator {
+    top: 10px;
+    padding: 6px 12px;
   }
   
   .clarity-value {
-    font-size: 20px;
+    font-size: 12px;
   }
   
   .region-label {
-    font-size: 14px;
+    font-size: 9px;
   }
   
   .side-panel {
     border-left: none;
-    border-top: 3px solid var(--aged-brown);
+    border-top: 1px solid var(--surface-border);
   }
 }
 
 /* ============================================
-   ANIMATIONS
+   SEMANTIC STATE CLASSES
    ============================================ */
 
-@keyframes nodeAppear {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.state-focus {
+  color: var(--color-focus);
+  border-color: var(--color-focus);
 }
 
-.node-appear {
-  animation: nodeAppear 0.4s ease-out forwards;
+.state-progress {
+  color: var(--color-progress);
+  border-color: var(--color-progress);
 }
 
-@keyframes pulseGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 2px currentColor);
-  }
-  50% {
-    filter: drop-shadow(0 0 8px currentColor);
-  }
+.state-risk {
+  color: var(--color-risk);
+  border-color: var(--color-risk);
 }
 
-.node-highlight {
-  animation: pulseGlow 2s ease-in-out infinite;
+.state-evidence {
+  color: var(--color-evidence);
+  border-color: var(--color-evidence);
 }
 
-/* Page load reveal */
-@keyframes mapReveal {
-  from {
-    opacity: 0;
-    filter: sepia(0.5) brightness(0.8);
-  }
-  to {
-    opacity: 1;
-    filter: sepia(0) brightness(1);
-  }
+.state-muted {
+  color: var(--color-muted);
+  border-color: var(--color-muted);
 }
 
-.map-reveal {
-  animation: mapReveal 1s ease-out forwards;
-}
-
-/* ============================================
-   ENHANCED PAPER TEXTURE
-   ============================================ */
-
-.paper-aged {
-  background-image: 
-    /* Subtle grain */
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
-    /* Base color gradient */
-    radial-gradient(
-      ellipse at 30% 20%,
-      #f4e4c1 0%,
-      #e8d4a8 50%,
-      #d4c49a 100%
-    );
-}
-
-/* Stained paper effect */
-.paper-stained::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(
-      ellipse at 80% 70%,
-      rgba(139, 115, 85, 0.1) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse at 20% 80%,
-      rgba(139, 88, 58, 0.08) 0%,
-      transparent 40%
-    );
-  pointer-events: none;
-}
-
-/* ============================================
-   HAND-DRAWN EFFECTS
-   ============================================ */
-
-/* Wobbly line animation for borders */
-@keyframes wobble {
-  0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(0.5px, -0.5px); }
-  50% { transform: translate(-0.5px, 0.5px); }
-  75% { transform: translate(0.5px, 0.5px); }
-}
-
-.hand-drawn-border {
-  animation: wobble 4s ease-in-out infinite;
-}
-
-/* Sketchy underline */
-.sketch-underline {
-  position: relative;
-}
-
-.sketch-underline::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--ink-black) 0px,
-    var(--ink-black) 3px,
-    transparent 3px,
-    transparent 5px
-  );
-  opacity: 0.6;
-}
-
-/* ============================================
-   ANNOTATION STYLES
-   ============================================ */
-
-.annotation {
-  font-family: var(--font-annotation);
-  color: var(--ink-blue-faded);
-  font-size: 14px;
-  line-height: 1.4;
-  transform: rotate(-1deg);
-}
-
-.annotation-note {
-  position: relative;
-  padding: 8px 12px;
-  background: rgba(244, 228, 193, 0.8);
-  border-left: 3px solid var(--ink-blue);
-  font-family: var(--font-annotation);
-  color: var(--ink-black-faded);
-  font-size: 14px;
-}
-
-.annotation-arrow {
-  position: relative;
-}
-
-.annotation-arrow::before {
-  content: '↳';
-  margin-right: 4px;
-  color: var(--ink-blue);
-}
-
-/* Scribble effect for deleted/crossed out */
-.scribble-out {
-  position: relative;
-  color: var(--ink-red-faded);
-  opacity: 0.6;
-}
-
-.scribble-out::after {
-  content: '';
-  position: absolute;
-  left: -5%;
-  right: -5%;
-  top: 50%;
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--ink-red) 5%,
-    var(--ink-red) 95%,
-    transparent 100%
-  );
-  transform: rotate(-2deg);
-}
-
-/* ============================================
-   INK SPLATTER EFFECTS
-   ============================================ */
-
-.ink-splatter {
-  position: relative;
-}
-
-.ink-splatter::before {
-  content: '';
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: var(--ink-black);
-  border-radius: 50%;
-  opacity: 0.3;
-  top: -4px;
-  right: -4px;
-}
-
-/* ============================================
-   COMPASS AND DECORATIVE ELEMENTS
-   ============================================ */
-
-.compass-needle {
-  transform-origin: center;
-  animation: compass-spin 20s linear infinite;
-}
-
-@keyframes compass-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Decorative corner flourish */
-.corner-flourish {
-  position: absolute;
-  width: 40px;
-  height: 40px;
-  opacity: 0.4;
-}
-
-.corner-flourish.top-left {
-  top: 15px;
-  left: 15px;
-  border-top: 2px solid var(--aged-brown);
-  border-left: 2px solid var(--aged-brown);
-}
-
-.corner-flourish.top-right {
-  top: 15px;
-  right: 15px;
-  border-top: 2px solid var(--aged-brown);
-  border-right: 2px solid var(--aged-brown);
-}
-
-.corner-flourish.bottom-left {
-  bottom: 15px;
-  left: 15px;
-  border-bottom: 2px solid var(--aged-brown);
-  border-left: 2px solid var(--aged-brown);
-}
-
-.corner-flourish.bottom-right {
-  bottom: 15px;
-  right: 15px;
-  border-bottom: 2px solid var(--aged-brown);
-  border-right: 2px solid var(--aged-brown);
-}
-
-/* ============================================
-   EXPEDITION LOG STYLES
-   ============================================ */
-
-.expedition-log-entry {
-  position: relative;
-  padding: 16px;
-  padding-left: 32px;
-  border-bottom: 1px dashed var(--aged-brown-light);
-}
-
-.expedition-log-entry::before {
-  content: '•';
-  position: absolute;
-  left: 12px;
-  top: 16px;
-  color: var(--aged-brown);
-  font-size: 18px;
-}
-
-.expedition-log-entry:last-child {
-  border-bottom: none;
-}
-
-.expedition-log-date {
-  font-family: var(--font-body);
-  font-size: 11px;
-  color: var(--aged-brown-light);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 4px;
-}
-
-.expedition-log-content {
-  font-family: var(--font-annotation);
-  font-size: 15px;
-  color: var(--ink-black-faded);
-  line-height: 1.5;
-}
-
-/* ============================================
-   SEPIA FILTER FOR VINTAGE LOOK
-   ============================================ */
-
-.sepia-light {
-  filter: sepia(0.1);
-}
-
-.sepia-medium {
-  filter: sepia(0.25);
-}
-
-/* ============================================
-   WATER STAIN EFFECT
-   ============================================ */
-
-.water-stain {
-  position: relative;
-}
-
-.water-stain::after {
-  content: '';
-  position: absolute;
-  width: 100px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(139, 115, 85, 0.08) 0%,
-    rgba(139, 115, 85, 0.05) 40%,
-    transparent 70%
-  );
-  pointer-events: none;
-}
-
-/* ============================================
-   TIMELINE CONNECTOR LINE
-   ============================================ */
-
-.timeline-line {
-  position: absolute;
-  left: 20px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(
-    180deg,
-    var(--aged-brown) 0%,
-    var(--aged-brown-light) 50%,
-    transparent 100%
-  );
-}
-
-/* ============================================
-   BUTTON VARIANTS FOR PARCHMENT THEME
-   ============================================ */
-
-.btn-parchment {
-  background: var(--parchment-mid);
-  border: 2px solid var(--aged-brown);
-  color: var(--ink-black);
-  font-family: var(--font-header);
-  letter-spacing: 1px;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-parchment:hover {
-  background: var(--aged-brown);
-  color: var(--parchment-light);
-  transform: translateY(-1px);
-}
-
-.btn-parchment:active {
-  transform: translateY(0);
-}
-
-.btn-parchment-outline {
-  background: transparent;
-  border: 2px solid var(--aged-brown);
-  color: var(--aged-brown);
-  font-family: var(--font-header);
-  letter-spacing: 1px;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-parchment-outline:hover {
-  background: rgba(139, 115, 85, 0.1);
-}
-
-.btn-success {
-  background: var(--ink-green);
-  border: 2px solid var(--ink-green-faded);
-  color: var(--parchment-light);
-  font-family: var(--font-header);
-  letter-spacing: 1px;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-success:hover {
-  background: var(--ink-green-light);
-  transform: translateY(-1px);
-}
-
-.btn-danger {
-  background: transparent;
-  border: 2px solid var(--ink-red);
-  color: var(--ink-red);
-  font-family: var(--font-header);
-  letter-spacing: 1px;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-danger:hover {
-  background: var(--ink-red);
-  color: var(--parchment-light);
-}
+/* Background variants */
+.bg-focus { background: var(--color-focus-muted, rgba(245, 200, 66, 0.15)); }
+.bg-progress { background: var(--color-progress-muted); }
+.bg-risk { background: var(--color-risk-muted); }
+.bg-evidence { background: var(--color-evidence-muted); }

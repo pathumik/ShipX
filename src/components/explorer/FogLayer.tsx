@@ -12,24 +12,13 @@ interface FogLayerProps {
   clarity: number;
 }
 
-// Calculate fog opacity based on clarity score
-function getFogOpacity(clarity: number): number {
-  if (clarity >= 70) return 0.1;   // Almost clear - low fog
-  if (clarity >= 40) return 0.4;   // Partial fog
-  return 0.7;                       // Heavy fog
-}
-
-// Get CSS class for fog state
-function getFogClass(fogState: FogState): string {
-  switch (fogState) {
-    case "low":
-      return "fog-low";
-    case "medium":
-      return "fog-medium";
-    case "high":
-    default:
-      return "fog-high";
-  }
+// Calculate darkness opacity based on clarity score
+function getDarknessOpacity(clarity: number): number {
+  if (clarity >= 80) return 0.05;  // Almost fully explored
+  if (clarity >= 60) return 0.2;   // Mostly clear
+  if (clarity >= 40) return 0.4;   // Partial darkness
+  if (clarity >= 20) return 0.6;   // Heavy darkness
+  return 0.75;                      // Very dark - unexplored
 }
 
 export default function FogLayer({
@@ -41,115 +30,55 @@ export default function FogLayer({
   clarity,
 }: FogLayerProps) {
   // Calculate dynamic opacity based on clarity
-  const opacity = useMemo(() => getFogOpacity(clarity), [clarity]);
-  const fogClass = getFogClass(fogState);
-
-  // Generate fog pattern with organic shapes
-  const fogPatternId = useMemo(() => `fogPattern-${x}-${y}`, [x, y]);
+  const opacity = useMemo(() => getDarknessOpacity(clarity), [clarity]);
   
-  // Create organic cloud-like shapes for fog
-  const cloudPaths = useMemo(() => {
-    const paths: string[] = [];
-    const numClouds = 5;
-    const cloudWidth = width / numClouds;
-    
-    for (let i = 0; i < numClouds; i++) {
-      const cx = x + cloudWidth * i + cloudWidth / 2;
-      const cy = y + height / 2 + Math.sin(i * 0.8) * 30;
-      const r1 = 40 + Math.sin(i * 1.2) * 15;
-      const r2 = 30 + Math.cos(i * 0.9) * 10;
-      
-      // Create blobby cloud shape using circles
-      paths.push(`
-        M ${cx - r1} ${cy}
-        Q ${cx - r1} ${cy - r2}, ${cx} ${cy - r2}
-        Q ${cx + r1} ${cy - r2}, ${cx + r1} ${cy}
-        Q ${cx + r1} ${cy + r2}, ${cx} ${cy + r2}
-        Q ${cx - r1} ${cy + r2}, ${cx - r1} ${cy}
-        Z
-      `);
-    }
-    
-    return paths;
-  }, [x, y, width, height]);
+  // Generate unique gradient ID
+  const gradientId = useMemo(() => `darkness-${x}-${y}`, [x, y]);
 
-  // If clarity is very high, don't render fog
+  // If clarity is very high, don't render darkness
   if (clarity >= 90) {
     return null;
   }
 
   return (
-    <g className={`fog-layer ${fogClass}`} style={{ pointerEvents: "none" }}>
-      {/* Fog gradient definition */}
+    <g className="fog-layer" style={{ pointerEvents: "none" }}>
+      {/* Darkness gradient definition */}
       <defs>
-        <linearGradient id={fogPatternId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f4e4c1" stopOpacity={opacity} />
-          <stop offset="30%" stopColor="#e8d4a8" stopOpacity={opacity * 0.8} />
-          <stop offset="70%" stopColor="#f4e4c1" stopOpacity={opacity * 0.9} />
-          <stop offset="100%" stopColor="#e8d4a8" stopOpacity={opacity} />
-        </linearGradient>
-
-        {/* Blur filter for soft fog edges */}
-        <filter id={`fogBlur-${x}-${y}`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
-        </filter>
+        <radialGradient id={gradientId} cx="50%" cy="50%" r="70%">
+          <stop offset="0%" stopColor="#0d0d0f" stopOpacity={opacity * 0.3} />
+          <stop offset="60%" stopColor="#0d0d0f" stopOpacity={opacity * 0.7} />
+          <stop offset="100%" stopColor="#0d0d0f" stopOpacity={opacity} />
+        </radialGradient>
       </defs>
 
-      {/* Base fog rectangle with gradient */}
+      {/* Main darkness layer with radial gradient */}
       <rect
         x={x}
         y={y}
         width={width}
         height={height}
-        fill={`url(#${fogPatternId})`}
+        fill={`url(#${gradientId})`}
         style={{
-          transition: "opacity 1.2s ease-out",
-          opacity: opacity,
+          transition: "opacity 0.8s ease-out",
         }}
       />
 
-      {/* Organic cloud shapes overlay */}
-      {cloudPaths.map((path, index) => (
-        <path
-          key={index}
-          d={path}
-          fill="#f4e4c1"
-          filter={`url(#fogBlur-${x}-${y})`}
-          style={{
-            opacity: opacity * 0.6,
-            transition: "opacity 1.2s ease-out",
-          }}
-        />
-      ))}
-
-      {/* Animated shimmer effect for mysterious feeling */}
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        fill="url(#fogShimmer)"
-        style={{
-          opacity: opacity * 0.3,
-          mixBlendMode: "overlay",
-        }}
-      />
-
-      {/* Mystery text indicator when fog is heavy */}
-      {fogState === "high" && (
+      {/* Unexplored indicator when darkness is heavy */}
+      {fogState === "high" && clarity < 30 && (
         <text
           x={x + width / 2}
           y={y + height / 2}
           textAnchor="middle"
-          fill="#8b7355"
-          fontSize="14"
-          fontStyle="italic"
+          fill="#3a3a42"
+          fontSize="11"
+          fontWeight="500"
+          letterSpacing="2"
           style={{
-            fontFamily: "var(--font-body)",
-            opacity: 0.5,
+            fontFamily: "var(--font-header)",
+            textTransform: "uppercase",
           }}
         >
-          Unexplored Territory
+          UNEXPLORED
         </text>
       )}
     </g>

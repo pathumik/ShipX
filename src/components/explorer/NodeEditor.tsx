@@ -44,8 +44,8 @@ export default function NodeEditor({
       <div>
         <label
           htmlFor="node-label"
-          className="block text-sm font-medium mb-2"
-          style={{ color: "#8b7355", fontFamily: "var(--font-header)" }}
+          className="block text-xs font-medium mb-2 uppercase tracking-wider"
+          style={{ color: "#6a6a78" }}
         >
           Label *
         </label>
@@ -55,20 +55,16 @@ export default function NodeEditor({
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="Enter node label..."
-          className="w-full px-4 py-3 rounded border-2 focus:outline-none focus:border-[#3a5a8b]"
+          className="w-full px-4 py-3 rounded-lg focus:outline-none transition-colors"
           style={{
-            backgroundColor: "#f4e4c1",
-            borderColor: "#8b7355",
-            color: "#2c2416",
-            fontFamily: "var(--font-body)",
+            backgroundColor: "#1a1a20",
+            border: "1px solid #2a2a32",
+            color: "#f0f0f0",
           }}
           maxLength={50}
           required
         />
-        <p
-          className="text-xs mt-1"
-          style={{ color: "#8b7355", fontFamily: "var(--font-body)" }}
-        >
+        <p className="text-xs mt-1" style={{ color: "#4a4a54" }}>
           {label.length}/50 characters
         </p>
       </div>
@@ -76,8 +72,8 @@ export default function NodeEditor({
       {/* Type selection */}
       <div>
         <label
-          className="block text-sm font-medium mb-2"
-          style={{ color: "#8b7355", fontFamily: "var(--font-header)" }}
+          className="block text-xs font-medium mb-3 uppercase tracking-wider"
+          style={{ color: "#6a6a78" }}
         >
           Type *
         </label>
@@ -87,16 +83,11 @@ export default function NodeEditor({
               key={t}
               type="button"
               onClick={() => setType(t)}
-              className={`p-3 rounded border-2 text-sm capitalize transition-all ${
-                type === t ? "ring-2 ring-offset-2" : ""
-              }`}
+              className="p-3 rounded-lg text-sm capitalize transition-all"
               style={{
-                backgroundColor: type === t ? getTypeColor(t) : "#f4e4c1",
-                borderColor: getTypeColor(t),
-                color: type === t ? "#f4e4c1" : "#2c2416",
-                fontFamily: "var(--font-body)",
-                // Ring color handled via --tw-ring-color
-                ["--tw-ring-color" as string]: getTypeColor(t),
+                backgroundColor: type === t ? getTypeColor(t) + "20" : "#1a1a20",
+                border: `1px solid ${type === t ? getTypeColor(t) : "#2a2a32"}`,
+                color: type === t ? getTypeColor(t) : "#9a9aa8",
               }}
             >
               <span className="block text-lg mb-1">{getTypeIcon(t)}</span>
@@ -110,8 +101,8 @@ export default function NodeEditor({
       <div>
         <label
           htmlFor="node-description"
-          className="block text-sm font-medium mb-2"
-          style={{ color: "#8b7355", fontFamily: "var(--font-header)" }}
+          className="block text-xs font-medium mb-2 uppercase tracking-wider"
+          style={{ color: "#6a6a78" }}
         >
           Description (optional)
         </label>
@@ -121,19 +112,15 @@ export default function NodeEditor({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Add a note or description..."
           rows={3}
-          className="w-full px-4 py-3 rounded border-2 focus:outline-none focus:border-[#3a5a8b] resize-none"
+          className="w-full px-4 py-3 rounded-lg focus:outline-none resize-none transition-colors"
           style={{
-            backgroundColor: "#f4e4c1",
-            borderColor: "#8b7355",
-            color: "#2c2416",
-            fontFamily: "var(--font-annotation)",
+            backgroundColor: "#1a1a20",
+            border: "1px solid #2a2a32",
+            color: "#f0f0f0",
           }}
           maxLength={200}
         />
-        <p
-          className="text-xs mt-1"
-          style={{ color: "#8b7355", fontFamily: "var(--font-body)" }}
-        >
+        <p className="text-xs mt-1" style={{ color: "#4a4a54" }}>
           {description.length}/200 characters
         </p>
       </div>
@@ -143,27 +130,14 @@ export default function NodeEditor({
         <button
           type="submit"
           disabled={!label.trim()}
-          className="flex-1 py-3 px-4 rounded font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: "#3a6b3a",
-            color: "#f4e4c1",
-            fontFamily: "var(--font-header)",
-            letterSpacing: "1px",
-          }}
+          className="flex-1 py-3 px-4 rounded-lg font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed btn-primary"
         >
           {mode === "create" ? "ADD NODE" : "SAVE CHANGES"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-3 rounded font-medium transition-all"
-          style={{
-            backgroundColor: "transparent",
-            border: "2px solid #8b7355",
-            color: "#8b7355",
-            fontFamily: "var(--font-header)",
-            letterSpacing: "1px",
-          }}
+          className="px-6 py-3 rounded-lg font-medium transition-all btn-blackboard"
         >
           CANCEL
         </button>
@@ -174,14 +148,7 @@ export default function NodeEditor({
         <button
           type="button"
           onClick={onDelete}
-          className="w-full py-3 px-4 rounded font-medium transition-all mt-4"
-          style={{
-            backgroundColor: "transparent",
-            border: "2px solid #8b3a3a",
-            color: "#8b3a3a",
-            fontFamily: "var(--font-header)",
-            letterSpacing: "1px",
-          }}
+          className="w-full py-3 px-4 rounded-lg font-medium transition-all mt-4 btn-danger"
         >
           DELETE NODE
         </button>
@@ -190,17 +157,17 @@ export default function NodeEditor({
   );
 }
 
-// Helper function to get color for node type
+// Helper function to get color for node type - using semantic colors
 function getTypeColor(type: NodeType): string {
   switch (type) {
     case "assumption":
-      return "#8b3a3a";
+      return "#e54545"; // Red - risk
     case "checkpoint":
-      return "#3a5a8b";
+      return "#60a5fa"; // Blue - evidence
     case "note":
-      return "#8b7355";
+      return "#9a9aa8"; // Muted
     default:
-      return "#8b7355";
+      return "#9a9aa8";
   }
 }
 

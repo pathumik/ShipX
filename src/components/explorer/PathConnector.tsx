@@ -35,30 +35,30 @@ export default function PathConnector({
   // Create path
   const pathD = `M ${fromX} ${fromY} Q ${controlX} ${controlY} ${toX} ${toY}`;
 
-  // Get styles based on connection status
+  // Get styles based on connection status - using semantic colors
   const getPathStyles = () => {
     switch (connection.status) {
       case "validated":
         return {
-          stroke: "#3a6b3a",
-          strokeWidth: 2.5,
+          stroke: "#4ade80", // Green - progress
+          strokeWidth: 2,
           strokeDasharray: "none",
           opacity: 1,
         };
       case "abandoned":
         return {
-          stroke: "#8b3a3a",
-          strokeWidth: 1.5,
-          strokeDasharray: "6 4",
-          opacity: 0.5,
+          stroke: "#e54545", // Red - risk
+          strokeWidth: 1,
+          strokeDasharray: "4 6",
+          opacity: 0.4,
         };
       case "active":
       default:
         return {
-          stroke: "#2c2416",
-          strokeWidth: 2,
-          strokeDasharray: "8 4",
-          opacity: 0.8,
+          stroke: "#9a9aa8", // White-ish structure
+          strokeWidth: 1.5,
+          strokeDasharray: "6 4",
+          opacity: 0.6,
         };
     }
   };
@@ -67,14 +67,14 @@ export default function PathConnector({
 
   return (
     <g className="path-connector">
-      {/* Shadow/glow effect for validated paths */}
+      {/* Glow effect for validated paths */}
       {connection.status === "validated" && (
         <path
           d={pathD}
           fill="none"
-          stroke="#3a6b3a"
+          stroke="#4ade80"
           strokeWidth={6}
-          opacity={0.2}
+          opacity={0.15}
           strokeLinecap="round"
         />
       )}
@@ -94,7 +94,7 @@ export default function PathConnector({
       {/* Arrow at the end */}
       <g transform={`translate(${toX}, ${toY}) rotate(${Math.atan2(toY - controlY, toX - controlX) * 180 / Math.PI})`}>
         <polygon
-          points="-8,-4 0,0 -8,4"
+          points="-6,-3 0,0 -6,3"
           fill={styles.stroke}
           opacity={styles.opacity}
         />
