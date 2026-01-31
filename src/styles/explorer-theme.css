@@ -1,0 +1,1050 @@
+/* ============================================
+   SHIPX EXPLORER MAP THEME
+   Cartographer / Old Map Visual System
+   ============================================ */
+
+/* ============================================
+   CSS VARIABLES - SEMANTIC COLOR SYSTEM
+   ============================================ */
+
+:root {
+  /* Base Parchment Colors */
+  --parchment-light: #f4e4c1;
+  --parchment-mid: #e8d4a8;
+  --parchment-dark: #d4c49a;
+  --parchment-shadow: #c4b088;
+  
+  /* Aged Brown - Structure */
+  --aged-brown: #8b7355;
+  --aged-brown-light: #a08868;
+  --aged-brown-dark: #6b5a45;
+  
+  /* Black Ink - Confirmed/Known */
+  --ink-black: #2c2416;
+  --ink-black-faded: #4a3d2e;
+  
+  /* Red Ink - Risk/Danger */
+  --ink-red: #8b3a3a;
+  --ink-red-light: #a54a4a;
+  --ink-red-faded: #6b2a2a;
+  
+  /* Blue Ink - Evidence/Learning */
+  --ink-blue: #3a5a8b;
+  --ink-blue-light: #4a6a9b;
+  --ink-blue-faded: #2a4a7b;
+  
+  /* Green Ink - Progress/Clarity */
+  --ink-green: #3a6b3a;
+  --ink-green-light: #4a7b4a;
+  --ink-green-faded: #2a5b2a;
+  
+  /* Fog Colors */
+  --fog-color: rgba(244, 228, 193, 0.9);
+  --fog-heavy: 0.75;
+  --fog-medium: 0.45;
+  --fog-light: 0.15;
+  
+  /* Typography - using CSS variables from layout */
+  --font-header: var(--font-cinzel), 'Times New Roman', serif;
+  --font-body: var(--font-crimson), 'Georgia', serif;
+  --font-annotation: var(--font-caveat), cursive;
+  
+  /* Spacing */
+  --map-padding: 24px;
+  --node-size: 32px;
+  --panel-width: 380px;
+  
+  /* Transitions */
+  --transition-fog: 1.2s ease-out;
+  --transition-panel: 0.3s ease-out;
+  --transition-node: 0.2s ease-out;
+}
+
+/* ============================================
+   EXPLORER MAP CONTAINER
+   ============================================ */
+
+.explorer-map-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--parchment-light);
+}
+
+.explorer-map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ============================================
+   PARCHMENT TEXTURE
+   ============================================ */
+
+.parchment-bg {
+  fill: var(--parchment-light);
+}
+
+/* SVG filter for paper texture */
+.paper-texture {
+  filter: url(#paperTexture);
+}
+
+/* Noise overlay for texture */
+.texture-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Vignette effect */
+.vignette-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(139, 115, 85, 0.15) 100%
+  );
+}
+
+/* ============================================
+   REGION TERRITORIES
+   ============================================ */
+
+.map-region {
+  cursor: pointer;
+  transition: filter var(--transition-node);
+}
+
+.map-region:hover {
+  filter: brightness(1.02);
+}
+
+.region-territory {
+  fill: var(--parchment-mid);
+  stroke: var(--aged-brown);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+}
+
+.region-territory-demand {
+  fill: rgba(58, 107, 58, 0.05);
+}
+
+.region-territory-feasibility {
+  fill: rgba(58, 90, 139, 0.05);
+}
+
+.region-territory-timing {
+  fill: rgba(139, 58, 58, 0.05);
+}
+
+/* Region Labels */
+.region-label {
+  font-family: var(--font-header);
+  font-size: 18px;
+  font-weight: 600;
+  fill: var(--aged-brown);
+  text-anchor: middle;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.region-sublabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  fill: var(--aged-brown-light);
+  text-anchor: middle;
+  font-style: italic;
+}
+
+/* Primary region highlight */
+.region-primary .region-territory {
+  stroke: var(--ink-black);
+  stroke-width: 3;
+}
+
+.region-primary .region-label {
+  fill: var(--ink-black);
+}
+
+/* ============================================
+   FOG OF UNCERTAINTY
+   ============================================ */
+
+.fog-layer {
+  fill: var(--parchment-light);
+  transition: opacity var(--transition-fog);
+  pointer-events: none;
+}
+
+.fog-high {
+  opacity: var(--fog-heavy);
+}
+
+.fog-medium {
+  opacity: var(--fog-medium);
+}
+
+.fog-low {
+  opacity: var(--fog-light);
+}
+
+/* Fog clearing animation */
+@keyframes fogClear {
+  from {
+    opacity: var(--fog-heavy);
+  }
+  to {
+    opacity: var(--fog-light);
+  }
+}
+
+.fog-clearing {
+  animation: fogClear var(--transition-fog) ease-out forwards;
+}
+
+/* ============================================
+   MAP NODES (SYMBOLS)
+   ============================================ */
+
+.map-node {
+  cursor: pointer;
+  transition: transform var(--transition-node), opacity var(--transition-node);
+}
+
+.map-node:hover {
+  transform: scale(1.15);
+}
+
+.map-node.selected {
+  transform: scale(1.2);
+}
+
+/* Node symbol base */
+.node-symbol {
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Assumption node (flag) */
+.node-assumption .node-symbol {
+  fill: none;
+  stroke: var(--ink-red);
+}
+
+.node-assumption.validated .node-symbol {
+  stroke: var(--ink-green);
+}
+
+/* Checkpoint node (dot) */
+.node-checkpoint .node-symbol {
+  fill: var(--ink-blue);
+  stroke: var(--ink-blue);
+}
+
+/* Completed node (diamond) */
+.node-completed .node-symbol {
+  fill: var(--ink-green);
+  stroke: var(--ink-green-faded);
+}
+
+/* Blocked node (cross) */
+.node-blocked .node-symbol {
+  fill: none;
+  stroke: var(--ink-red);
+  stroke-width: 3;
+}
+
+/* Locked node */
+.node-locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.node-locked:hover {
+  transform: none;
+}
+
+/* User-created node indicator */
+.node-user-created .node-symbol {
+  stroke-dasharray: 3 2;
+}
+
+/* Node labels */
+.node-label {
+  font-family: var(--font-annotation);
+  font-size: 14px;
+  fill: var(--ink-black-faded);
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+/* Node tooltip */
+.node-tooltip {
+  font-family: var(--font-body);
+  font-size: 12px;
+  fill: var(--ink-black);
+  background: var(--parchment-light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.map-node:hover .node-tooltip {
+  opacity: 1;
+}
+
+/* ============================================
+   PATH CONNECTORS
+   ============================================ */
+
+.path-connector {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.path-active {
+  stroke: var(--ink-black);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
+}
+
+.path-validated {
+  stroke: var(--ink-green);
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+.path-abandoned {
+  stroke: var(--ink-red-faded);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 8;
+  opacity: 0.5;
+}
+
+.path-potential {
+  stroke: var(--aged-brown-light);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+  opacity: 0.3;
+}
+
+/* Animated path drawing */
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.path-drawing {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPath 2s ease-out forwards;
+}
+
+/* ============================================
+   SIDE PANEL
+   ============================================ */
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--panel-width);
+  max-width: 90vw;
+  height: 100%;
+  background: var(--parchment-light);
+  border-left: 3px solid var(--aged-brown);
+  box-shadow: -8px 0 24px rgba(44, 36, 22, 0.15);
+  transform: translateX(100%);
+  transition: transform var(--transition-panel);
+  z-index: 100;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.side-panel.open {
+  transform: translateX(0);
+}
+
+.side-panel-header {
+  position: sticky;
+  top: 0;
+  padding: 20px;
+  background: var(--parchment-mid);
+  border-bottom: 2px solid var(--aged-brown);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.side-panel-title {
+  font-family: var(--font-header);
+  font-size: 18px;
+  color: var(--ink-black);
+  margin: 0;
+}
+
+.side-panel-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px solid var(--aged-brown);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--aged-brown);
+  transition: all 0.2s;
+}
+
+.side-panel-close:hover {
+  background: var(--aged-brown);
+  color: var(--parchment-light);
+}
+
+.side-panel-content {
+  padding: 20px;
+}
+
+/* Panel backdrop */
+.panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(44, 36, 22, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 99;
+}
+
+.panel-backdrop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================
+   MAP LEGEND
+   ============================================ */
+
+.map-legend {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  padding: 16px;
+  background: var(--parchment-mid);
+  border: 2px solid var(--aged-brown);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  z-index: 50;
+}
+
+.legend-title {
+  font-family: var(--font-header);
+  font-size: 14px;
+  color: var(--ink-black);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--ink-black-faded);
+}
+
+.legend-symbol {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================
+   CLARITY INDICATOR
+   ============================================ */
+
+.clarity-indicator {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  background: var(--parchment-mid);
+  border: 2px solid var(--aged-brown);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  z-index: 50;
+}
+
+.clarity-label {
+  font-size: 11px;
+  color: var(--aged-brown);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.clarity-value {
+  font-family: var(--font-header);
+  font-size: 24px;
+  color: var(--ink-black);
+}
+
+.clarity-bar {
+  width: 120px;
+  height: 6px;
+  background: var(--parchment-dark);
+  border-radius: 3px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.clarity-fill {
+  height: 100%;
+  background: var(--ink-green);
+  border-radius: 3px;
+  transition: width 0.5s ease-out;
+}
+
+/* ============================================
+   USER CONTROLS
+   ============================================ */
+
+.map-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 50;
+}
+
+.map-control-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--parchment-mid);
+  border: 2px solid var(--aged-brown);
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--ink-black);
+  transition: all 0.2s;
+}
+
+.map-control-btn:hover {
+  background: var(--aged-brown);
+  color: var(--parchment-light);
+}
+
+.map-control-btn.active {
+  background: var(--ink-blue);
+  border-color: var(--ink-blue);
+  color: var(--parchment-light);
+}
+
+/* ============================================
+   ANNOTATIONS
+   ============================================ */
+
+.map-annotation {
+  font-family: var(--font-annotation);
+  font-size: 16px;
+  fill: var(--ink-blue-faded);
+  cursor: pointer;
+  transition: fill 0.2s;
+}
+
+.map-annotation:hover {
+  fill: var(--ink-blue);
+}
+
+.map-annotation.user-note {
+  fill: var(--ink-black-faded);
+}
+
+/* ============================================
+   COMPASS ROSE
+   ============================================ */
+
+.compass-rose {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 60px;
+  height: 60px;
+  opacity: 0.6;
+  z-index: 50;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --panel-width: 100vw;
+    --node-size: 28px;
+  }
+  
+  .map-legend {
+    bottom: auto;
+    top: 80px;
+    left: 10px;
+    padding: 12px;
+  }
+  
+  .clarity-indicator {
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+  }
+  
+  .clarity-value {
+    font-size: 20px;
+  }
+  
+  .region-label {
+    font-size: 14px;
+  }
+  
+  .side-panel {
+    border-left: none;
+    border-top: 3px solid var(--aged-brown);
+  }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes nodeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.node-appear {
+  animation: nodeAppear 0.4s ease-out forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+.node-highlight {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Page load reveal */
+@keyframes mapReveal {
+  from {
+    opacity: 0;
+    filter: sepia(0.5) brightness(0.8);
+  }
+  to {
+    opacity: 1;
+    filter: sepia(0) brightness(1);
+  }
+}
+
+.map-reveal {
+  animation: mapReveal 1s ease-out forwards;
+}
+
+/* ============================================
+   ENHANCED PAPER TEXTURE
+   ============================================ */
+
+.paper-aged {
+  background-image: 
+    /* Subtle grain */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    /* Base color gradient */
+    radial-gradient(
+      ellipse at 30% 20%,
+      #f4e4c1 0%,
+      #e8d4a8 50%,
+      #d4c49a 100%
+    );
+}
+
+/* Stained paper effect */
+.paper-stained::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(
+      ellipse at 80% 70%,
+      rgba(139, 115, 85, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 20% 80%,
+      rgba(139, 88, 58, 0.08) 0%,
+      transparent 40%
+    );
+  pointer-events: none;
+}
+
+/* ============================================
+   HAND-DRAWN EFFECTS
+   ============================================ */
+
+/* Wobbly line animation for borders */
+@keyframes wobble {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(0.5px, -0.5px); }
+  50% { transform: translate(-0.5px, 0.5px); }
+  75% { transform: translate(0.5px, 0.5px); }
+}
+
+.hand-drawn-border {
+  animation: wobble 4s ease-in-out infinite;
+}
+
+/* Sketchy underline */
+.sketch-underline {
+  position: relative;
+}
+
+.sketch-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink-black) 0px,
+    var(--ink-black) 3px,
+    transparent 3px,
+    transparent 5px
+  );
+  opacity: 0.6;
+}
+
+/* ============================================
+   ANNOTATION STYLES
+   ============================================ */
+
+.annotation {
+  font-family: var(--font-annotation);
+  color: var(--ink-blue-faded);
+  font-size: 14px;
+  line-height: 1.4;
+  transform: rotate(-1deg);
+}
+
+.annotation-note {
+  position: relative;
+  padding: 8px 12px;
+  background: rgba(244, 228, 193, 0.8);
+  border-left: 3px solid var(--ink-blue);
+  font-family: var(--font-annotation);
+  color: var(--ink-black-faded);
+  font-size: 14px;
+}
+
+.annotation-arrow {
+  position: relative;
+}
+
+.annotation-arrow::before {
+  content: '↳';
+  margin-right: 4px;
+  color: var(--ink-blue);
+}
+
+/* Scribble effect for deleted/crossed out */
+.scribble-out {
+  position: relative;
+  color: var(--ink-red-faded);
+  opacity: 0.6;
+}
+
+.scribble-out::after {
+  content: '';
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: 50%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--ink-red) 5%,
+    var(--ink-red) 95%,
+    transparent 100%
+  );
+  transform: rotate(-2deg);
+}
+
+/* ============================================
+   INK SPLATTER EFFECTS
+   ============================================ */
+
+.ink-splatter {
+  position: relative;
+}
+
+.ink-splatter::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--ink-black);
+  border-radius: 50%;
+  opacity: 0.3;
+  top: -4px;
+  right: -4px;
+}
+
+/* ============================================
+   COMPASS AND DECORATIVE ELEMENTS
+   ============================================ */
+
+.compass-needle {
+  transform-origin: center;
+  animation: compass-spin 20s linear infinite;
+}
+
+@keyframes compass-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Decorative corner flourish */
+.corner-flourish {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  opacity: 0.4;
+}
+
+.corner-flourish.top-left {
+  top: 15px;
+  left: 15px;
+  border-top: 2px solid var(--aged-brown);
+  border-left: 2px solid var(--aged-brown);
+}
+
+.corner-flourish.top-right {
+  top: 15px;
+  right: 15px;
+  border-top: 2px solid var(--aged-brown);
+  border-right: 2px solid var(--aged-brown);
+}
+
+.corner-flourish.bottom-left {
+  bottom: 15px;
+  left: 15px;
+  border-bottom: 2px solid var(--aged-brown);
+  border-left: 2px solid var(--aged-brown);
+}
+
+.corner-flourish.bottom-right {
+  bottom: 15px;
+  right: 15px;
+  border-bottom: 2px solid var(--aged-brown);
+  border-right: 2px solid var(--aged-brown);
+}
+
+/* ============================================
+   EXPEDITION LOG STYLES
+   ============================================ */
+
+.expedition-log-entry {
+  position: relative;
+  padding: 16px;
+  padding-left: 32px;
+  border-bottom: 1px dashed var(--aged-brown-light);
+}
+
+.expedition-log-entry::before {
+  content: '•';
+  position: absolute;
+  left: 12px;
+  top: 16px;
+  color: var(--aged-brown);
+  font-size: 18px;
+}
+
+.expedition-log-entry:last-child {
+  border-bottom: none;
+}
+
+.expedition-log-date {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--aged-brown-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.expedition-log-content {
+  font-family: var(--font-annotation);
+  font-size: 15px;
+  color: var(--ink-black-faded);
+  line-height: 1.5;
+}
+
+/* ============================================
+   SEPIA FILTER FOR VINTAGE LOOK
+   ============================================ */
+
+.sepia-light {
+  filter: sepia(0.1);
+}
+
+.sepia-medium {
+  filter: sepia(0.25);
+}
+
+/* ============================================
+   WATER STAIN EFFECT
+   ============================================ */
+
+.water-stain {
+  position: relative;
+}
+
+.water-stain::after {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(139, 115, 85, 0.08) 0%,
+    rgba(139, 115, 85, 0.05) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ============================================
+   TIMELINE CONNECTOR LINE
+   ============================================ */
+
+.timeline-line {
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--aged-brown) 0%,
+    var(--aged-brown-light) 50%,
+    transparent 100%
+  );
+}
+
+/* ============================================
+   BUTTON VARIANTS FOR PARCHMENT THEME
+   ============================================ */
+
+.btn-parchment {
+  background: var(--parchment-mid);
+  border: 2px solid var(--aged-brown);
+  color: var(--ink-black);
+  font-family: var(--font-header);
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-parchment:hover {
+  background: var(--aged-brown);
+  color: var(--parchment-light);
+  transform: translateY(-1px);
+}
+
+.btn-parchment:active {
+  transform: translateY(0);
+}
+
+.btn-parchment-outline {
+  background: transparent;
+  border: 2px solid var(--aged-brown);
+  color: var(--aged-brown);
+  font-family: var(--font-header);
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-parchment-outline:hover {
+  background: rgba(139, 115, 85, 0.1);
+}
+
+.btn-success {
+  background: var(--ink-green);
+  border: 2px solid var(--ink-green-faded);
+  color: var(--parchment-light);
+  font-family: var(--font-header);
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-success:hover {
+  background: var(--ink-green-light);
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background: transparent;
+  border: 2px solid var(--ink-red);
+  color: var(--ink-red);
+  font-family: var(--font-header);
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: var(--ink-red);
+  color: var(--parchment-light);
+}
